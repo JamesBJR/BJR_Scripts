@@ -84,49 +84,70 @@ Loop {
 		PriestStart:
 		GetGuiStates()
 		Random, rand, 150, 300
+		Random, randLong, 250, 450
+		GetColorPriest()
+		Sleep, rand 
 		
 		; Cast order in and out of combat
-		
-		if (CheckPixelColorAndAct(1270, 920, "0xE8D8FF", "")) { ; Casting check
+        ; Casting check
+		if (probeColorCAST="0xE8D8FF") {
 			Goto, PriestStart
-		}
-		CheckPixelColorAndAct(1462, 920, "0xBEFF00", "0") ; probeColorHP20
-		CheckPixelColorAndAct(1442, 920, "0x06FF00", "6")  ; HP25%
-		
-		if (CheckPixelColorAndAct(1478, 920, "0xFFA51D", "")) { ; HP65%
-			if (CheckPixelColorAndAct(1513, 920, "0xADFFD1", "") = false) { ; Renew
+		} else if (probeColorHP20="0xBEFF00") {
+			Send, 0
+			Sleep, rand
+		} else if (probeColorHP25="0x06FF00") {
+			Send, 6
+			Sleep, rand
+		} else if (probeColorHP65="0xFFA51D") {
+			if (probeColorRNW!="0xADFFD1") {
 				Send, 7
 				Sleep, rand
 			} else {
 				Send, 6
 				Sleep, rand
 			}
-		}	
-		
-		CheckPixelColorAndAct(1378, 920, "0xFFFCF9", "=") ; Fortitude
-		CheckPixelColorAndAct(1325, 920, "0x3B8BFF", "9") ; Inner Fire
+		} else if (probeColorFT="0xFFFCF9") {
+			Send, =
+			Sleep, rand
+		} else if (probeColorIF="0x3B8BFF") {
+			Send, 9
+			Sleep, rand
+		}
 		
         ; Main combat check, if combat use rotation
-		
-		if ((CheckPixelColorAndAct(1496, 920, "0x00A9FF", "") = false) && PwsToggle=1)  ;THP check
-				CheckPixelColorAndAct(1343, 920, "0xFF64FE", "-") ; Shield
-		
-		CheckPixelColorAndAct(1309, 920, "0xFF99BB", "2") ;Homunculi
-		
-		if ((CheckPixelColorAndAct(1496, 920, "0x00A9FF", "") = false)) { ;THp
-				CheckPixelColorAndAct(1415, 920, "0x00F1FF", "8") ;Void Plague
-				CheckPixelColorAndAct(1360, 920, "0x7141FF", "4") ;Shadow pain
-			if (HfToggle=1)  ;
-					CheckPixelColorAndAct(1326, 920, "0x00FFF4", "5") ;Holy Fire
-		} 
-		CheckPixelColorAndAct(1397, 920, "0xFF5118", "3") ;Pennance
-		CheckPixelColorAndAct(334, 1036, "0x1A74DD", "1") ;Wand
-		
+		if (probeColorCC="0x1705FF" || KillonSight=1) {
+			if (probeColorCAST="0xE8D8FF") {
+				Goto, PriestStart
+			} else if (probeColorPWS="0xFF64FE" && probeColorTHP!="0x00A9FF" && PwsToggle=1) {
+				Send, -
+				Sleep, rand
+			} else if (probeColorHUM="0xFF99BB") {
+				Send, 2
+				Sleep, rand
+			} else if (probeColorVP="0x00F1FF" && probeColorTHP!="0x00A9FF") {
+				Send, 8
+				Sleep, rand
+			} else if (probeColorSWP="0x7141FF" && probeColorTHP!="0x00A9FF") {
+				Send, 4
+				Sleep, rand
+			} else if (probeColorHF="0x00FFF4" && probeColorTHP!="0x00A9FF" && HfToggle=1) {
+				Send, 5
+				Sleep, rand
+			} else if (probeColorPEN="0xFF5118") {
+				Send, 3
+				Sleep, rand
+			} else if (probeColorSHT="0x1A74DD") {
+				Send, 1
+				Sleep, rand
+			}
+		}
 		
         ; Out of combat check
-		if (CheckPixelColorAndAct(1251, 920, "0x1705FF", "") = false){ ; CombatCheck
-			CheckPixelColorAndAct(1478, 920, "0xFFA51D", "6") ;Hp 65 Check and cask
-			
+		if (probeColorCC!="0x1705FF") {
+			if (probeColorHP65="0xFFA51D") {
+				Send, 6
+				Sleep, rand
+			}
 		}
 	}
 	
@@ -261,11 +282,18 @@ Loop {
 	$0::SpamOrSend(0)
 	Return
 	SpamOrSend(checkkey){
-	    if (SpamOpt = 1)
+	    if (SpamOpt = 1){
         	Spam(checkkey)
-	     else 
-        	Send, %checkkey%
-	    }	
+		} else {
+        ; Send key down
+        SendInput, {%checkkey% down}
+        ; Wait for key up event
+        KeyWait, %checkkey%
+        ; Send key up
+        SendInput, {%checkkey% up}
+		}   
+	 }
+	
 
 	$^3:: ; Used for finding color values
 	GetGuiStates()
