@@ -7,7 +7,7 @@
 	;Define Global variables to be used between functions / gui
 		;variables for Gui
 global PriestState, PwsToggle, HfToggle, HunterState, AspCheeta, DruidState
-global DebugOption, KillonSight
+global DebugOption, KillonSight, SpamOpt
 global originalTexts := {} ; An associative array to store original checkbox labels
 
 		;variables for priest pixels
@@ -20,9 +20,6 @@ global probeColorCC, probeColorHP25, probeColorHP20, probeColorHP65, probeColorT
 global probeColorCC, probeColorHP25, probeColorHP20, probeColorHP65, probeColorCAST, probeColorTHP, probeColorWRATH, probeColorMOON, probeColorWILD, probeColorFURY, probeColorSUN, probeColorSTAR, probeColorTHORN
 
 
-
-
-
 Gui, +AlwaysOnTop -MaximizeBox +Theme ; Add +AlwaysOnTop option to make the GUI window always on top
 
 ; Add DropDownList for Debug options
@@ -32,7 +29,7 @@ Gui, Add, DropDownList, x2 y4 w80 vDebugOption Choose1, Debug Off|PriestBug|Hunt
 Gui, Add, Slider, x87 y4 w80 h20 vTransparency gUpdateTransparency Range25-255, 175
 
 Gui, Add, Checkbox, x12 y29 w40 h20 vKillonSight, KoS
-Gui, Add, Checkbox, x62 y29 w40 h20 vOption2, Opt 2
+Gui, Add, Checkbox, x57 y29 w45 h20 vSpamOpt gUpdateState, Spam
 Gui, Add, Checkbox, x112 y29 w40 h20 vOption3, Opt 3
 Gui, Add, Checkbox, x12 y49 w40 h20 vOption4, Opt 4
 
@@ -53,7 +50,6 @@ Gui, Font, s12 ; Change the font size to 12
 Gui +LastFound +ToolWindow +E0x80000 ; WS_EX_LAYERED extended style
 Gui, Color, FFFFFF ; Set GUI background color to white
 WinSet, Transparent, 175 ; Set transparency level (0-255)
-
 
 
 GuiOpen:
@@ -78,6 +74,7 @@ Loop {
 		GuiControl,, HunterState, 0 
 		GuiControl,, AspCheeta, 0
 		GuiControl,, DruidState, 0
+
 		ResetCheckboxNames()
 		Sleep 500
 		Goto, Start
@@ -249,10 +246,30 @@ Loop {
 	
 	
 }
-	
-	
-	$3:: ; Used for finding color values
+
+;HotKeys start Here
+	;Spam Num keys
+	$1::SpamOrSend(1)
+	$2::SpamOrSend(2)
+	$3::SpamOrSend(3)
+	$4::SpamOrSend(4)
+	$5::SpamOrSend(5)
+	$6::SpamOrSend(6)
+	$7::SpamOrSend(7)
+	$8::SpamOrSend(8)
+	$9::SpamOrSend(9)
+	$0::SpamOrSend(0)
+	Return
+	SpamOrSend(checkkey){
+	    if (SpamOpt = 1)
+        	Spam(checkkey)
+	     else 
+        	Send, %checkkey%
+	    }	
+
+	$^3:: ; Used for finding color values
 	GetGuiStates()
+	
 	Switch DebugOption {
 		Case "Debug Off":
 		Send, 3
@@ -322,6 +339,16 @@ Loop {
 	}
 	
 	Return
+
+	;Functions Start here
+
+	Spam(Key) {
+    While (GetKeyState(Key, "P")) {
+        Send, %Key%
+		Random, rand, 150, 300 ; Generate a new random number for each key press
+		Sleep rand
+    }
+	}
 	
 	GetColorPriest() {
     ; Repeated code block for getting colors		
@@ -396,7 +423,7 @@ Loop {
 		GuiControlGet, PwsToggle
 		GuiControlGet, HfToggle
 		GuiControlGet, HunterState
-		GuiControlGet, AspCheeta
+		GuiControlGet, SpamOpt
 	}
 	
 	
@@ -437,6 +464,9 @@ Loop {
 		}
 		return false
 	}
+
+
+	; Subrutines start here
    ; To save the GUI window position to the registry
 	GuiClose:
 	WinGetPos, X, Y, Width, Height, NYMRB by B.J.R.
@@ -464,4 +494,7 @@ Loop {
 		GuiControl,, %A_GuiControl%, % originalTexts[A_GuiControl]
 	}
 	return
-	
+; Update state sub called after ticking boxes to update variables in function
+	UpdateState:
+	GetGuiStates()
+	return
