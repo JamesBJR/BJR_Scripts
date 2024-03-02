@@ -30,7 +30,7 @@ Gui, Add, Checkbox, x12 y29 w40 h20 vKillOpt, KoS
 Gui, Add, Checkbox, x63 y29 w45 h20 vSpamOpt gUpdateState, Spam
 Gui, Add, Checkbox, x122 y29 w45 h20 vKickOpt, Kick
 Gui, Add, Checkbox, x12 y49 w40 h20 vOption4, Opt 4
-Gui, Add, Button, x70 y52 w60 h15 gCopyWeakAura, Weak Aura
+Gui, Add, Text, x70 y52 w60 h15 gCopyWeakAura +Border, ` `Weak Aura
 
 originalTexts["PriestState"] := "Priest Rotation"
 Gui, Add, Checkbox, x35 y80 w100 h20 vPriestState gToggleBold, % originalTexts["PriestState"]
