@@ -7,7 +7,7 @@
 	;Define Global variables to be used between functions / gui
 		;variables for Gui
 global PriestState, PwsToggle, HfToggle, HunterState, AspCheeta, DruidState
-global DebugOption, KillonSight, SpamOpt
+global DebugOption, KillO, SpamOpt, KickOpt
 global originalTexts := {} ; An associative array to store original checkbox labels
 
 		;variables for priest pixels
@@ -26,10 +26,11 @@ Gui, Add, DropDownList, x2 y4 w80 vDebugOption Choose1, Debug Off|PriestBug|Hunt
 ; Add a slider for transparency control
 Gui, Add, Slider, x87 y4 w80 h20 vTransparency gUpdateTransparency Range25-255, 175
 
-Gui, Add, Checkbox, x12 y29 w40 h20 vKillonSight, KoS
-Gui, Add, Checkbox, x57 y29 w45 h20 vSpamOpt gUpdateState, Spam
-Gui, Add, Checkbox, x112 y29 w40 h20 vOption3, Opt 3
+Gui, Add, Checkbox, x12 y29 w40 h20 vKillOpt, KoS
+Gui, Add, Checkbox, x63 y29 w45 h20 vSpamOpt gUpdateState, Spam
+Gui, Add, Checkbox, x122 y29 w45 h20 vKickOpt, Kick
 Gui, Add, Checkbox, x12 y49 w40 h20 vOption4, Opt 4
+Gui, Add, Button, x70 y52 w60 h15 gCopyWeakAura, Weak Aura
 
 originalTexts["PriestState"] := "Priest Rotation"
 Gui, Add, Checkbox, x35 y80 w100 h20 vPriestState gToggleBold, % originalTexts["PriestState"]
@@ -65,7 +66,7 @@ Loop {
 	}
 	
 	if ((PriestState + HunterState + DruidState) >= 2 ){		;Idiot prevention if 2 or more variables are true then fuck off
-		GuiControl,, KillonSight, 0 
+		GuiControl,, KillOpt, 0 
 		GuiControl,, PriestState, 0 
 		GuiControl,, HfToggle, 0 
 		GuiControl,, PwsToggle, 0 
@@ -113,7 +114,7 @@ Loop {
 		}
 		
         ; Main combat check, if combat use rotation
-		if (probeColorCC="0x1705FF" || KillonSight=1) {
+		if (probeColorCC="0x1705FF" || KillOpt=1) {
 			if (probeColorCAST="0xE8D8FF") {
 				Goto, PriestStart
 			} else if (probeColorPWS="0xFF64FE" && probeColorTHP!="0x00A9FF" && PwsToggle=1) {
@@ -165,7 +166,7 @@ Loop {
 		}
 		
 		; main combat check, if combat use rotation
-		if (probeColorCC="0x1705FF" || KillonSight=1) { 
+		if (probeColorCC="0x1705FF" || KillOpt=1) { 
 			if (probeColorCAST="0xE8D8FF") {
 				Goto, HunterStart
 			} else if (probeColorHSTL!="0x00008A") {
@@ -233,7 +234,7 @@ Loop {
 			Sleep, rand
 		}
 		
-		if (probeColorCC="0x1705FF" || KillonSight=1) { ;main combat check, if combat use rotation53
+		if (probeColorCC="0x1705FF" || KillOpt=1) { ;main combat check, if combat use rotation53
 			if (probeColorCAST="0xE8D8FF") { ;casting check
 				Goto, DruidStart	
 			} else if (probeColorSTAR="0xE2A7FF") {
@@ -442,7 +443,7 @@ Loop {
 	}
 	GetGuiStates(){
 	;refresh states from Gui to script
-		GuiControlGet, KillonSight
+		GuiControlGet, KillOpt
 		GuiControlGet, DebugOption
 		GuiControlGet, DruidState
 		GuiControlGet, PriestState
@@ -530,5 +531,45 @@ Loop {
 	return
 ; Update state sub called after ticking boxes to update variables in function
 	UpdateState:
-	GetGuiStates()
-	return
+		GetGuiStates()
+		return
+
+	CopyWeakAura:
+		; Determine the base path for the files
+		basePath := A_ScriptDir . "\"
+		
+		; Initialize filePath variable
+		filePath := ""
+		
+		; Check which state is true and set the filePath accordingly
+		if (PriestState = 1)
+			filePath := basePath . "Priest Weak Aura.txt"
+		else if (HunterState = 1)
+			filePath := basePath . "Hunter Weak Aura.txt"
+		else if (DruidState = 1)
+			filePath := basePath . "Druid Weak Aura.txt"
+		
+		; If a state was true and filePath was set, proceed to copy the file content
+		if (filePath != "")
+		{
+			; Read the content of the file
+			FileRead, fileContent, %filePath%
+			
+			; Copy the content to the clipboard
+			Clipboard := fileContent
+			
+			; Show a tooltip as a notification that it was copied, which will disappear after 1 second
+			ToolTip, Content copied to clipboard.
+			SetTimer, RemoveToolTip, -1000 ; Remove the tooltip after 1 second
+		}
+		else
+		{
+			; If no state was true, show a tooltip notification
+			ToolTip, No active state detected.
+			SetTimer, RemoveToolTip, -1000
+		}
+	Return
+
+	RemoveToolTip:
+    	ToolTip ; This will clear the tooltip
+	Return
