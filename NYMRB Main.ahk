@@ -7,7 +7,7 @@
 	;Define Global variables to be used between functions / gui
 		;variables for Gui
 global PriestState, PwsToggle, HfToggle, HunterState, AspCheeta, DruidState
-global DebugOption, KillO, SpamOpt, KickOpt
+global DebugOption, KillOpt, SpamOpt, KickOpt
 global originalTexts := {} ; An associative array to store original checkbox labels
 
 		;variables for priest pixels
