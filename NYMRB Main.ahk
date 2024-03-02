@@ -19,9 +19,7 @@ global probeColorCC, probeColorHP25, probeColorHP20, probeColorHP65, probeColorT
 	;variables for Druid pixels
 global probeColorCC, probeColorHP25, probeColorHP20, probeColorHP65, probeColorCAST, probeColorTHP, probeColorWRATH, probeColorMOON, probeColorWILD, probeColorFURY, probeColorSUN, probeColorSTAR, probeColorTHORN
 
-
 Gui, +AlwaysOnTop -MaximizeBox +Theme ; Add +AlwaysOnTop option to make the GUI window always on top
-
 ; Add DropDownList for Debug options
 Gui, Add, DropDownList, x2 y4 w80 vDebugOption Choose1, Debug Off|PriestBug|HunterBug|DruidBug 
 
