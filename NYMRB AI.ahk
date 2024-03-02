@@ -1,6 +1,6 @@
 ﻿#MaxThreadsPerHotkey 3
 #Persistent
-#Include C:\Users\BJRte\OneDrive\Desktop\Scripts\Gdip.ahk
+#Include %A_ScriptDir%\Gdip.ahk
 #SingleInstance force
 
 
