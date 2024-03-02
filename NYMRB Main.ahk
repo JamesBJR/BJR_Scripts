@@ -59,7 +59,7 @@ LoadGuiPositionFromRegistry()
 Loop {
 	Start:
 	GetGuiStates()
-	if ((PriestState + HunterState + DruidState) = 0 ) {			
+	if (((PriestState + HunterState + DruidState) = 0 )) {			
 		Goto, Start
 		Sleep 500
 	}
@@ -489,6 +489,14 @@ Loop {
 			return true
 		}
 		return false
+	}
+	CheckActiveWindowIsWoW() {
+   	 WinGetTitle, activeWindowTitle, A ; Gets the title of the active (foreground) window
+	    if (activeWindowTitle = "World of Warcraft") 
+	        return 1 ; The active window is World of Warcraft
+    	 else 
+        	return 0 ; The active window is not World of Warcraft
+	    
 	}
 
 
